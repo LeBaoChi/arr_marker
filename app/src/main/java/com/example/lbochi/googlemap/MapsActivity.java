@@ -45,6 +45,8 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     private ProgressDialog progressDialog;
     int PLACE_PICKER_REQUEST = 1;
 
+    private EditText marker_title;
+    public String marker_1="1";
     private static final LatLng[] LatLng_arr = new LatLng[]{
             new LatLng(21.007050, 105.842613), new LatLng(21.007061, 105.842838),
             new LatLng(21.007066, 105.843106), new LatLng(-23.202307, 135.395508),
@@ -70,10 +72,13 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
                 sendRequest();
             }
         });
+        marker_title = (EditText) findViewById(R.id.marker_title);
     }
 
     private void sendRequest() {
         String origin = etOrigin.getText().toString();
+        marker_1 = marker_title.getText().toString();
+
         String destination = etDestination.getText().toString();
         if (origin.isEmpty()) {
             Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
@@ -109,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        addMarkersToMap();
+//        addMarkersToMap();
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -197,7 +202,9 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     }
 
     public boolean onMarkerClick (Marker marker){
-        marker.setTitle(String.valueOf(marker));
+//        marker_title = (EditText) findViewById(R.id.marker_title);
+//        destination = etDestination.getText().toString();
+        marker.setTitle(marker_1);
         return  false;
     }
 
