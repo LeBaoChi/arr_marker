@@ -1,11 +1,15 @@
 package com.example.lbochi.googlemap;
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,9 +29,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
@@ -49,6 +60,9 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     private EditText marker_title;
     private Button submit_title;
     public String marker_1="Title";
+    private static final String SHARED_PREFS_NAME = "MY_SHARED_PREF";
+    ArrayList<String> mylist = new ArrayList<String>();
+    private static final String TAG = MapsActivity.class.getSimpleName();
 
     public List<LatLng> points=new ArrayList<LatLng>();;
 //    points.add(new LatLng(21.007050, 105.842613));
@@ -56,12 +70,18 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     public LatLng[] LatLng_arr = new LatLng[]{
             new LatLng(21.007050, 105.842613), new LatLng(21.007061, 105.842838),
             new LatLng(21.007066, 105.843106), new LatLng(21.005155, 105.845375),
-            new LatLng(21.006240, 105.843130)};
+            new LatLng(21.006240, 105.843130),new LatLng(21.006240, 105.843130),
+            new LatLng(21.006240, 105.843130),new LatLng(21.006240, 105.843130),
+            new LatLng(21.006240, 105.843130),new LatLng(21.006240, 105.843130)};
 
-
+    public MapsActivity(){
+        //Empty constructor
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        mylist = getSavedArrayList();
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -89,6 +109,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
                 submitTitle();
             }
         });
+
     }
     private void submitTitle(){
         marker_1 = marker_title.getText().toString();
@@ -97,6 +118,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         etDestination.setVisibility(LinearLayout.VISIBLE);
         btnFindPath.setVisibility(LinearLayout.VISIBLE);
         submit_title.setVisibility(LinearLayout.GONE);
+        marker_1="Title";
         return;
     }
     private void sendRequest() {
@@ -147,8 +169,9 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     }
     private void addMarkersToMap() {
 
-        int numMarkersInRainbow =5 ;
-        for (int i = 0; i < LatLng_arr.length; i++) {
+        int j =0 ;
+        for (int i = 0; i < mylist.size(); i++) {
+
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(LatLng_arr[i])
                     .title("Marker " + i));
@@ -223,6 +246,8 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(String.valueOf(points.size())));
+        mylist.add(marker_1);
+        Log.d("ADebugTag", "Map Click: " + (mylist));
     }
 
     public boolean onMarkerClick (Marker marker){
@@ -238,8 +263,66 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
             marker.setTitle(marker_1);
         }
 
+        Log.d("ADebugTag", "Marker Click: " + (mylist.size()));
         return  false;
     }
+    private void saveArrayList(ArrayList<String> arrayList) {
+        try {
+            FileOutputStream fileOutputStream = openFileOutput("points.dat", Context.MODE_PRIVATE);
+            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+            out.writeObject(arrayList);
+            out.close();
+            fileOutputStream.close();
+            Log.d("ADebugTag", "Save ");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList<String> getSavedArrayList() {
+        ArrayList<String> savedArrayList = null;
+
+        try {
+            FileInputStream inputStream = openFileInput("points.dat");
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            savedArrayList = (ArrayList<String>) in.readObject();
+            in.close();
+            inputStream.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return savedArrayList;
+    }
+
+//    public boolean saveArray() {
+//        SharedPreferences sp = this.getSharedPreferences(SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
+//        SharedPreferences.Editor mEdit1 = sp.edit();
+//        Set<String> set = new HashSet<String>();
+//        set.addAll(mylist);
+//        mEdit1.putStringSet("list", set);
+//        return mEdit1.commit();
+//    }
+//
+//    public ArrayList<String> getArray() {
+//        SharedPreferences sp = this.getSharedPreferences(SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
+//
+//        //NOTE: if shared preference is null, the method return empty Hashset and not null
+//        Set<String> set = sp.getStringSet("list", new HashSet<String>());
+//
+//        return new ArrayList<String>(set);
+//    }
+
+    public void onStop() {
+//        saveArray();
+        ArrayList<String> mylist1 = new ArrayList<String>();
+        saveArrayList(mylist);
+        super.onStop();
+        Log.d("ADebugTag", "Đóng ap ");
+    }
+
 
 
 }
