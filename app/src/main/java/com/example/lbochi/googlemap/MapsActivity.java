@@ -50,10 +50,13 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     private Button submit_title;
     public String marker_1="Title";
 
-    private static final LatLng[] LatLng_arr = new LatLng[]{
+    public List<LatLng> points=new ArrayList<LatLng>();;
+//    points.add(new LatLng(21.007050, 105.842613));
+
+    public LatLng[] LatLng_arr = new LatLng[]{
             new LatLng(21.007050, 105.842613), new LatLng(21.007061, 105.842838),
-            new LatLng(21.007066, 105.843106), new LatLng(-23.202307, 135.395508),
-            new LatLng(-19.705347, 129.550781)};
+            new LatLng(21.007066, 105.843106), new LatLng(21.005155, 105.845375),
+            new LatLng(21.006240, 105.843130)};
 
 
     @Override
@@ -216,10 +219,10 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     @Override
     public void onMapClick( LatLng point) {
         mMapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
-
+        points.add(point);
         mMap.addMarker(new MarkerOptions()
                 .position(point)
-                .title("TouchPoint1"));
+                .title(String.valueOf(points.size())));
     }
 
     public boolean onMarkerClick (Marker marker){
@@ -231,7 +234,10 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         submit_title.setVisibility(LinearLayout.VISIBLE);
 //        marker_title = (EditText) findViewById(R.id.marker_title);
 //        destination = etDestination.getText().toString();
-        marker.setTitle(marker_1);
+        if(marker_1!="Title"){
+            marker.setTitle(marker_1);
+        }
+
         return  false;
     }
 
