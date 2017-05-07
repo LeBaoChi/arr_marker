@@ -44,7 +44,7 @@ import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
 import Modules.Route;
 
-public class MapsActivity extends FragmentActivity implements  OnMapReadyCallback,DirectionFinderListener,GoogleMap.OnMapClickListener,GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends FragmentActivity implements  java.io.Serializable,OnMapReadyCallback,DirectionFinderListener,GoogleMap.OnMapClickListener,GoogleMap.OnMarkerClickListener {
     private MapFragment mMapFragment;
 
     private GoogleMap mMap;
@@ -82,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
 
         super.onCreate(savedInstanceState);
         mylist = getSavedArrayList();
+        Log.d("ADebugTag", "mylist Point: " + mylist);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -165,20 +166,19 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
 
-
     }
     private void addMarkersToMap() {
 
-        int j =0 ;
+        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10));
         for (int i = 0; i < mylist.size(); i++) {
-
+            String[] latlong =  mylist.get(i).substring(10,mylist.get(1).length()-5).split(",");
+            double longitude = Double.parseDouble(latlong[1]);
+            Log.d("ADebugTag", "latlong: " + longitude);
+            double latitude = Double.parseDouble(latlong[0]);
+            Log.d("ADebugTag", "latlong: " + latitude);
             Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(LatLng_arr[i])
+                    .position(new LatLng(latitude, longitude))
                     .title("Marker " + i));
-//                    .icon(BitmapDescriptorFactory.defaultMarker(i * 360 / numMarkersInRainbow))
-//                    .flat(flat)
-//                    .rotation(rotation));
-//            mMarkerRainbow.add(marker);
         }
     }
 
@@ -240,14 +240,18 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     }
 
     @Override
-    public void onMapClick( LatLng point) {
+    public void onMapClick(LatLng point) {
         mMapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
         points.add(point);
         mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(String.valueOf(points.size())));
-        mylist.add(marker_1);
-        Log.d("ADebugTag", "Map Click: " + (mylist));
+
+        mylist.add(String.valueOf(point));
+        Log.d("ADebugTag", "Point: " + new LatLng(point.longitude,point.latitude));
+
+//        mylist.add(new LatLng(point.longitude,point.latitude));
+        Log.d("ADebugTag", "Point1: " + mylist);
     }
 
     public boolean onMarkerClick (Marker marker){
@@ -262,13 +266,16 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         if(marker_1!="Title"){
             marker.setTitle(marker_1);
         }
+        saveArrayList(mylist);
+        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10,mylist.get(1).length()-2));
 
-        Log.d("ADebugTag", "Marker Click: " + (mylist.size()));
+        Log.d("ADebugTag", "mylist " + (mylist));
         return  false;
     }
+
     private void saveArrayList(ArrayList<String> arrayList) {
         try {
-            FileOutputStream fileOutputStream = openFileOutput("points.dat", Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = openFileOutput("points1.dat", Context.MODE_PRIVATE);
             ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
             out.writeObject(arrayList);
             out.close();
@@ -284,7 +291,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         ArrayList<String> savedArrayList = null;
 
         try {
-            FileInputStream inputStream = openFileInput("points.dat");
+            FileInputStream inputStream = openFileInput("points1.dat");
             ObjectInputStream in = new ObjectInputStream(inputStream);
             savedArrayList = (ArrayList<String>) in.readObject();
             in.close();
@@ -297,27 +304,9 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
         return savedArrayList;
     }
 
-//    public boolean saveArray() {
-//        SharedPreferences sp = this.getSharedPreferences(SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
-//        SharedPreferences.Editor mEdit1 = sp.edit();
-//        Set<String> set = new HashSet<String>();
-//        set.addAll(mylist);
-//        mEdit1.putStringSet("list", set);
-//        return mEdit1.commit();
-//    }
-//
-//    public ArrayList<String> getArray() {
-//        SharedPreferences sp = this.getSharedPreferences(SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
-//
-//        //NOTE: if shared preference is null, the method return empty Hashset and not null
-//        Set<String> set = sp.getStringSet("list", new HashSet<String>());
-//
-//        return new ArrayList<String>(set);
-//    }
-
     public void onStop() {
-//        saveArray();
-        ArrayList<String> mylist1 = new ArrayList<String>();
+//        saveArray();`
+//        ArrayList<String> mylist1 = new ArrayList<String>();
         saveArrayList(mylist);
         super.onStop();
         Log.d("ADebugTag", "Đóng ap ");
