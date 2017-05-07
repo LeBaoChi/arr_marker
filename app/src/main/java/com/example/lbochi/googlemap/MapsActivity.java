@@ -60,7 +60,6 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     private EditText marker_title;
     private Button submit_title;
     public String marker_1="Title";
-    private static final String SHARED_PREFS_NAME = "MY_SHARED_PREF";
     ArrayList<String> mylist = new ArrayList<String>();
     private static final String TAG = MapsActivity.class.getSimpleName();
 
@@ -119,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         etDestination.setVisibility(LinearLayout.VISIBLE);
         btnFindPath.setVisibility(LinearLayout.VISIBLE);
         submit_title.setVisibility(LinearLayout.GONE);
-        marker_1="Title";
+
         return;
     }
     private void sendRequest() {
@@ -169,13 +168,13 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     }
     private void addMarkersToMap() {
 
-        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10));
+
         for (int i = 0; i < mylist.size(); i++) {
             String[] latlong =  mylist.get(i).substring(10,mylist.get(1).length()-5).split(",");
             double longitude = Double.parseDouble(latlong[1]);
-            Log.d("ADebugTag", "latlong: " + longitude);
+
             double latitude = Double.parseDouble(latlong[0]);
-            Log.d("ADebugTag", "latlong: " + latitude);
+
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .title("Marker " + i));
