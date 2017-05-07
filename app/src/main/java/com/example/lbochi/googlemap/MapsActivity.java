@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +47,9 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     int PLACE_PICKER_REQUEST = 1;
 
     private EditText marker_title;
-    public String marker_1="1";
+    private Button submit_title;
+    public String marker_1="Title";
+
     private static final LatLng[] LatLng_arr = new LatLng[]{
             new LatLng(21.007050, 105.842613), new LatLng(21.007061, 105.842838),
             new LatLng(21.007066, 105.843106), new LatLng(-23.202307, 135.395508),
@@ -72,12 +75,30 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
                 sendRequest();
             }
         });
-        marker_title = (EditText) findViewById(R.id.marker_title);
-    }
 
+        marker_title = (EditText) findViewById(R.id.marker_title);
+        marker_title.setVisibility(LinearLayout.GONE);
+        submit_title= (Button) findViewById(R.id.submit_title);
+        submit_title.setVisibility(LinearLayout.GONE);
+        submit_title.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitTitle();
+            }
+        });
+    }
+    private void submitTitle(){
+        marker_1 = marker_title.getText().toString();
+        marker_title.setVisibility(LinearLayout.GONE);
+        etOrigin.setVisibility(LinearLayout.VISIBLE);
+        etDestination.setVisibility(LinearLayout.VISIBLE);
+        btnFindPath.setVisibility(LinearLayout.VISIBLE);
+        submit_title.setVisibility(LinearLayout.GONE);
+        return;
+    }
     private void sendRequest() {
         String origin = etOrigin.getText().toString();
-        marker_1 = marker_title.getText().toString();
+
 
         String destination = etDestination.getText().toString();
         if (origin.isEmpty()) {
@@ -114,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-//        addMarkersToMap();
+        addMarkersToMap();
         mMap.setMyLocationEnabled(true);
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -124,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     private void addMarkersToMap() {
 
         int numMarkersInRainbow =5 ;
-        for (int i = 0; i < numMarkersInRainbow; i++) {
+        for (int i = 0; i < LatLng_arr.length; i++) {
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(LatLng_arr[i])
                     .title("Marker " + i));
@@ -202,6 +223,12 @@ public class MapsActivity extends FragmentActivity implements  OnMapReadyCallbac
     }
 
     public boolean onMarkerClick (Marker marker){
+        // ẩn và hiện các layout
+        marker_title.setVisibility(LinearLayout.VISIBLE);
+        etOrigin.setVisibility(LinearLayout.GONE);
+        etDestination.setVisibility(LinearLayout.GONE);
+        btnFindPath.setVisibility(LinearLayout.GONE);
+        submit_title.setVisibility(LinearLayout.VISIBLE);
 //        marker_title = (EditText) findViewById(R.id.marker_title);
 //        destination = etDestination.getText().toString();
         marker.setTitle(marker_1);
