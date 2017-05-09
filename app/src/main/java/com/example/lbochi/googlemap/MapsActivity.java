@@ -61,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     private Button submit_title;
     public String marker_1="Title";
     ArrayList<String> mylist = new ArrayList<String>();
+    ArrayList<String> namelist = new ArrayList<String>();
     private static final String TAG = MapsActivity.class.getSimpleName();
 
     public List<LatLng> points=new ArrayList<LatLng>();;
@@ -81,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 
         super.onCreate(savedInstanceState);
         mylist = getSavedArrayList();
+        namelist=getSavedArrayNameList();
         Log.d("ADebugTag", "mylist Point: " + mylist);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -118,7 +120,8 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         etDestination.setVisibility(LinearLayout.VISIBLE);
         btnFindPath.setVisibility(LinearLayout.VISIBLE);
         submit_title.setVisibility(LinearLayout.GONE);
-
+        namelist.add(marker_1);
+        saveArrayNameList(namelist);
         return;
     }
     private void sendRequest() {
@@ -167,20 +170,23 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 
     }
     private void addMarkersToMap() {
+        Log.d("ADebugTag", "namelist: " + namelist);
+        Log.d("ADebugTag", "mylist: " + mylist.get(0));
+        if(namelist!=null && mylist!=null) {
+            for (int i = 0; i < mylist.size() && i < namelist.size(); i++) {
+                String[] latlong = mylist.get(i).substring(10, mylist.get(0).length() - 5).split(",");
+                double longitude = Double.parseDouble(latlong[1]);
 
-
-        for (int i = 0; i < mylist.size(); i++) {
-            String[] latlong =  mylist.get(i).substring(10,mylist.get(1).length()-5).split(",");
-            double longitude = Double.parseDouble(latlong[1]);
-
-            double latitude = Double.parseDouble(latlong[0]);
-
-            Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .title("Marker " + i));
+                double latitude = Double.parseDouble(latlong[0]);
+                String name = namelist.get(i);
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(latitude, longitude))
+                        .title(name)
+                );
+                marker.showInfoWindow();
+            }
         }
     }
-
     @Override
     public void onDirectionFinderStart() {
         progressDialog = ProgressDialog.show(this, "Please wait.",
@@ -240,14 +246,16 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 
     @Override
     public void onMapClick(LatLng point) {
+        Log.d("ADebugTag", "File: " + getFilesDir());
         mMapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
         points.add(point);
         mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(String.valueOf(points.size())));
-
+        Log.d("ADebugTag", "Point: " + String.valueOf(point));
         mylist.add(String.valueOf(point));
-        Log.d("ADebugTag", "Point: " + new LatLng(point.longitude,point.latitude));
+
+
 
 //        mylist.add(new LatLng(point.longitude,point.latitude));
         Log.d("ADebugTag", "Point1: " + mylist);
@@ -266,15 +274,16 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
             marker.setTitle(marker_1);
         }
         saveArrayList(mylist);
-        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10,mylist.get(1).length()-2));
 
-        Log.d("ADebugTag", "mylist " + (mylist));
+//        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10,mylist.get(1).length()-2));
+//
+//        Log.d("ADebugTag", "mylist " + (mylist));
         return  false;
     }
 
     private void saveArrayList(ArrayList<String> arrayList) {
         try {
-            FileOutputStream fileOutputStream = openFileOutput("points1.dat", Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = openFileOutput("toado.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
             ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
             out.writeObject(arrayList);
             out.close();
@@ -290,7 +299,37 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         ArrayList<String> savedArrayList = null;
 
         try {
-            FileInputStream inputStream = openFileInput("points1.dat");
+            FileInputStream inputStream = openFileInput("toado.dat");
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            savedArrayList = (ArrayList<String>) in.readObject();
+            in.close();
+            inputStream.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return savedArrayList;
+    }
+    private void saveArrayNameList(ArrayList<String> arrayList) {
+        try {
+            FileOutputStream fileOutputStream = openFileOutput("name.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
+            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+            out.writeObject(arrayList);
+            out.close();
+            fileOutputStream.close();
+            Log.d("ADebugTag", "Save ");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList<String> getSavedArrayNameList() {
+        ArrayList<String> savedArrayList = null;
+
+        try {
+            FileInputStream inputStream = openFileInput("name.dat");
             ObjectInputStream in = new ObjectInputStream(inputStream);
             savedArrayList = (ArrayList<String>) in.readObject();
             in.close();
@@ -307,6 +346,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 //        saveArray();`
 //        ArrayList<String> mylist1 = new ArrayList<String>();
         saveArrayList(mylist);
+        saveArrayNameList(namelist);
         super.onStop();
         Log.d("ADebugTag", "Đóng ap ");
     }
