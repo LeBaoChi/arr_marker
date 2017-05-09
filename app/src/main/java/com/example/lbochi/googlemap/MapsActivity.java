@@ -81,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        Log.d("ADebugTag", "mylist first: " + mylist);
         mylist = getSavedArrayList();
         namelist=getSavedArrayNameList();
         Log.d("ADebugTag", "mylist Point: " + mylist);
@@ -120,6 +121,9 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         etDestination.setVisibility(LinearLayout.VISIBLE);
         btnFindPath.setVisibility(LinearLayout.VISIBLE);
         submit_title.setVisibility(LinearLayout.GONE);
+        if(namelist==null){
+            namelist=new ArrayList<String>();
+        }
         namelist.add(marker_1);
         saveArrayNameList(namelist);
         return;
@@ -170,8 +174,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 
     }
     private void addMarkersToMap() {
-        Log.d("ADebugTag", "namelist: " + namelist);
-        Log.d("ADebugTag", "mylist: " + mylist.get(0));
+
         if(namelist!=null && mylist!=null) {
             for (int i = 0; i < mylist.size() && i < namelist.size(); i++) {
                 String[] latlong = mylist.get(i).substring(10, mylist.get(0).length() - 5).split(",");
@@ -252,7 +255,9 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(String.valueOf(points.size())));
-        Log.d("ADebugTag", "Point: " + String.valueOf(point));
+        if(mylist==null){
+           mylist = new ArrayList<String>();
+        }
         mylist.add(String.valueOf(point));
 
 
@@ -283,7 +288,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
 
     private void saveArrayList(ArrayList<String> arrayList) {
         try {
-            FileOutputStream fileOutputStream = openFileOutput("toado.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
+            FileOutputStream fileOutputStream = openFileOutput("toado2.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
             ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
             out.writeObject(arrayList);
             out.close();
@@ -299,7 +304,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         ArrayList<String> savedArrayList = null;
 
         try {
-            FileInputStream inputStream = openFileInput("toado.dat");
+            FileInputStream inputStream = openFileInput("toado2.dat");
             ObjectInputStream in = new ObjectInputStream(inputStream);
             savedArrayList = (ArrayList<String>) in.readObject();
             in.close();
@@ -313,7 +318,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     }
     private void saveArrayNameList(ArrayList<String> arrayList) {
         try {
-            FileOutputStream fileOutputStream = openFileOutput("name.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
+            FileOutputStream fileOutputStream = openFileOutput("name2.dat", Context.MODE_ENABLE_WRITE_AHEAD_LOGGING);
             ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
             out.writeObject(arrayList);
             out.close();
@@ -329,7 +334,7 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         ArrayList<String> savedArrayList = null;
 
         try {
-            FileInputStream inputStream = openFileInput("name.dat");
+            FileInputStream inputStream = openFileInput("name2.dat");
             ObjectInputStream in = new ObjectInputStream(inputStream);
             savedArrayList = (ArrayList<String>) in.readObject();
             in.close();
