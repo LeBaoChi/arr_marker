@@ -66,7 +66,6 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
     private static final String TAG = MapsActivity.class.getSimpleName();
 
     public List<LatLng> points=new ArrayList<LatLng>();;
-//    points.add(new LatLng(21.007050, 105.842613));
 
     public LatLng[] LatLng_arr = new LatLng[]{
             new LatLng(21.007050, 105.842613), new LatLng(21.007061, 105.842838),
@@ -125,11 +124,18 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         if(namelist==null){
             namelist=new ArrayList<String>();
         }
-        namelist.add(marker_1);
+
         if(mylist==null){
             mylist = new ArrayList<String>();
         }
-        mylist.add(String.valueOf(toaDo));
+        if (marker_1!="Title"){
+            namelist.add(marker_1);
+        }
+        if(toaDo!=""){
+            mylist.add(String.valueOf(toaDo));
+        }
+//        marker_1="Title";
+        toaDo="";
         saveArrayNameList(namelist);
         saveArrayList(mylist);
         return;
@@ -282,11 +288,8 @@ public class MapsActivity extends FragmentActivity implements  java.io.Serializa
         if(marker_1!="Title"){
             marker.setTitle(marker_1);
         }
+        marker_1="Title";
 
-
-//        Log.d("ADebugTag", "mylist Point: " + mylist.get(1).substring(10,mylist.get(1).length()-2));
-//
-//        Log.d("ADebugTag", "mylist " + (mylist));
         return  false;
     }
 
